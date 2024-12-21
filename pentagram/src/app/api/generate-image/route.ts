@@ -5,8 +5,18 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { text } = body;
 
-    // TODO: Call your Image Generation API here
-    // For now, we'll just echo back the text
+    const apiSecret = process.env.API_SECRET;
+    if (!apiSecret) {
+      throw new Error("API secret not set");
+    }
+
+    if (apiSecret !== request.headers.get("x-api-secret")) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
     const response = await fetch(
       "https://yohannik--pentagram-text-to-image-inference-web.modal.run/?prompt=" +
         text,
